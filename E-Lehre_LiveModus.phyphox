@@ -18,10 +18,14 @@
 			<string original="current">Strom</string>
 			<string original="average current">durchschnittlicher Strom</string>
 			<string original="time">Zeit</string>
-			<string original="U-I-plot">U-I-Diagramm</string>
+			<string original="U(t) Channel 1">U(t) Kanal 1</string>
+			<string original="U(t) Channel 2">U(t) Kanal 2</string>
 			<string original="voltage CH1">Spannung Kanal 1</string>
-			<string original="current CH2">Strom Kanal 2</string> "I-U-plot"
-			<string original="voltages CH1 and CH2">Spannung Kana 1 & 2</string> "I-U-plot"
+			<string original="current CH1">Strom Kanal 1</string>
+			<string original="voltages CH1 and CH2">Spannung Kanal 1 und 2</string>
+			<string original="Amperemeter CH1">Amperemeter Kanal 1</string>
+			<string original="I(t) CH1">I(t) Kanal 1</string>
+			
 			
 		</translation>
 	</translations>
@@ -88,14 +92,14 @@
     </analysis>
     <views>
         <view label="voltages CH1 and CH2">
-            <graph label="t-U-plot CH1" aspectRatio="2.5" style="lines" lineWidth="1" color="ff7e22" partialUpdate="false" history="1" labelX="time" labelY="voltage" labelZ="" unitX="s" unitY="V" unitZ="" logX="false" logY="false" logZ="false" xPrecision="3" yPrecision="3" zPrecision="3" scaleMinX="auto" scaleMaxX="auto" scaleMinY="auto" scaleMaxY="auto" scaleMinZ="auto" scaleMaxZ="auto" minX="0" maxX="0" minY="0" maxY="0" minZ="0" maxZ="0"  mapWidth="0"       >
+            <graph label="U(t) Channel 1" aspectRatio="2.5" style="lines" lineWidth="1" color="ff7e22" partialUpdate="false" history="1" labelX="time" labelY="voltage" labelZ="" unitX="s" unitY="V" unitZ="" logX="false" logY="false" logZ="false" xPrecision="3" yPrecision="3" zPrecision="3" scaleMinX="auto" scaleMaxX="auto" scaleMinY="auto" scaleMaxY="auto" scaleMinZ="auto" scaleMaxZ="auto" minX="0" maxX="0" minY="0" maxY="0" minZ="0" maxZ="0"  mapWidth="0"       >
                 <input axis="x">timeCH1_new</input>
                 <input axis="y">voltageCH1</input>
             </graph>
             <value label="voltage CH1" size="1" precision="3" scientific="false" unit="V" factor="1" >
                 <input>voltageCH1</input>
             </value>
-            <graph label="t-U-plot CH2" aspectRatio="2.5" style="lines" lineWidth="1" color="ff7e22" partialUpdate="false" history="1" labelX="time" labelY="voltage" labelZ="" unitX="s" unitY="V" unitZ="" logX="false" logY="false" logZ="false" xPrecision="3" yPrecision="3" zPrecision="3" scaleMinX="auto" scaleMaxX="auto" scaleMinY="auto" scaleMaxY="auto" scaleMinZ="auto" scaleMaxZ="auto" minX="0" maxX="0" minY="0" maxY="0" minZ="0" maxZ="0"  mapWidth="0"       >
+            <graph label="U(t) Channel 2" aspectRatio="2.5" style="lines" lineWidth="1" color="ff7e22" partialUpdate="false" history="1" labelX="time" labelY="voltage" labelZ="" unitX="s" unitY="V" unitZ="" logX="false" logY="false" logZ="false" xPrecision="3" yPrecision="3" zPrecision="3" scaleMinX="auto" scaleMaxX="auto" scaleMinY="auto" scaleMaxY="auto" scaleMinZ="auto" scaleMaxZ="auto" minX="0" maxX="0" minY="0" maxY="0" minZ="0" maxZ="0"  mapWidth="0"       >
                 <input axis="x">timeCH2_new</input>
                 <input axis="y">voltageCH2</input>
             </graph>
@@ -103,11 +107,11 @@
                 <input>voltageCH2</input>
             </value>
         </view>
-	<view label="ammeter CH1">
+	<view label="Amperemeter CH1">
             <edit label="resistor for current measurement" signed="false" decimal="false" unit="Ω" factor="1" default="10">
                 <output>resistorCH1</output>
             </edit>
-            <graph editor:uuid="159" editor:posx="1225.84375" editor:posy="483.71875" label="t-I-plot CH1" aspectRatio="2.5" style="lines" lineWidth="1" color="ff7e22" partialUpdate="false" history="1" labelX="time" labelY="current" labelZ="" unitX="s" unitY="mA" unitZ="" logX="false" logY="false" logZ="false" xPrecision="3" yPrecision="3" zPrecision="3" scaleMinX="auto" scaleMaxX="auto" scaleMinY="auto" scaleMaxY="auto" scaleMinZ="auto" scaleMaxZ="auto" minX="0" maxX="0" minY="0" maxY="0" minZ="0" maxZ="0"  mapWidth="0"       >
+            <graph label="I(t) CH1" aspectRatio="2.5" style="lines" lineWidth="1" color="ff7e22" partialUpdate="false" history="1" labelX="time" labelY="current" labelZ="" unitX="s" unitY="mA" unitZ="" logX="false" logY="false" logZ="false" xPrecision="3" yPrecision="3" zPrecision="3" scaleMinX="auto" scaleMaxX="auto" scaleMinY="auto" scaleMaxY="auto" scaleMinZ="auto" scaleMaxZ="auto" minX="0" maxX="0" minY="0" maxY="0" minZ="0" maxZ="0"  mapWidth="0"       >
                 <input axis="x">timeCH1_new</input>
                 <input axis="y">currentCH1</input>
             </graph>
