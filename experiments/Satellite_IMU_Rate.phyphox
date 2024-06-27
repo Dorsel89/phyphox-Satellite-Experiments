@@ -102,7 +102,6 @@
             <input as="in" clear="false">count</input>
             <output as="out">rate</output>
         </formula>
-		<multiply>
     </analysis>
     <export>
         <set name="Raw Data">
