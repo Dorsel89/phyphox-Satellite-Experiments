@@ -1,0 +1,95 @@
+<phyphox version="1.12">
+    <title>Temperature Probe</title>
+    <category>phyphox Thermodynamics-Box</category>
+    <color>b51312</color>
+    <description>Uses the external DS18B20 sensors of the thermodynamics board to measure temperature.</description>
+    <data-containers>
+        <container size="0">time_raw</container>
+        <container size="1">timeOffset</container>
+		<container size="0">time</container>
+        <container size="0">time_empty</container>
+
+        <container size="0">temperature_1</container>
+        <container size="0">temperature_2</container>
+        <container size="0">temperature_3</container>
+        <container size="0">temperature_4</container>
+        <container size="0">temperature_5</container>
+		
+		<container size="1">count</container>
+		<container size="1">first</container>
+		<container size="1">rate</container>
+
+        <container size="1" init="0">configButton</container>
+        <container size="3">byteArray</container>
+
+        <container size="1" init="1">interval</container>
+        <container size="1" init="1">nSensors</container>
+
+    </data-containers>
+    <input>
+        <bluetooth id="satellite-box" name="Satellit" mode="notification">
+            <config char="cddf1012-30f7-4671-8b43-5e40ba53514a" conversion="hexadecimal">010101</config>
+            <output char="cddf1011-30f7-4671-8b43-5e40ba53514a" offset="0" conversion="float32LittleEndian">time_raw</output>
+            <output char="cddf1011-30f7-4671-8b43-5e40ba53514a" offset="4" conversion="float32LittleEndian">temperature_1</output>
+        </bluetooth>
+    </input>       
+    <output>
+        <bluetooth id="satellite-box">
+            <input char="cddf1012-30f7-4671-8b43-5e40ba53514a" conversion="byteArray">byteArray</input>
+        </bluetooth>
+    </output>
+    <views>
+        <view label="Raw data">
+            <graph label="temperature" timeOnX="true" labelX="time" unitX="s" labelY="T" unitY="°C" partialUpdate="true">
+                <input axis="x">time</input>
+                <input axis="y">temperature_1</input>               
+            </graph>                  
+            <value label="T" unit="°C" size="1" precision="1" scientific="false" factor="1" >
+                <input>temperature_1</input>
+            </value> 
+        </view>       
+    </views>
+    <analysis sleep="0" onUserInput="false">
+		<first>
+            <input as="value" clear="false">time_raw</input>
+            <output as="first">timeOffset</output>
+        </first>
+		<subtract>
+            <input as="minuend" clear="false">time_raw</input>
+            <input as="subtrahend" clear="false">timeOffset</input>
+            <output as="difference">time</output>			
+        </subtract>
+        <count>
+            <input as="buffer" clear="false">temperature_1</input>
+            <output as="count">count</output>
+        </count>
+        <formula formula="[2]/([1])">
+            <input as="in" clear="false">time</input>
+            <input as="in" clear="false">count</input>
+            <output as="out">rate</output>
+        </formula>
+        <append>
+            <input type="value">1</input>
+            <input clear="false">interval</input>
+            <input clear="false">nSensors</input>
+            <output as="out">byteArray</output>
+		</append>
+        
+        <if equal="true">
+            <input clear="false">configButton</input>
+            <input type="value">0</input>
+            <input type="empty" />
+            <output as="result" clear="true">byteArray</output>
+        </if>  
+        <append>
+            <input type="value">0</input>
+            <output as="out">configButton</output>
+		</append>      
+    </analysis>
+    <export>
+        <set name="Raw data">
+            <data name="Time (s)">time</data>
+            <data name="Temperature (°C)">temperature_1</data>
+        </set>
+    </export>
+</phyphox>

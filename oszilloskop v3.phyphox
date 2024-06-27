@@ -1,0 +1,172 @@
+<phyphox version="1.15" locale="en">
+    <title>Oszilloscope Mode</title>
+    <category>phyphox electricity box</category>
+    <color>ffbe1a</color>
+    <description>As soon as the trigger button is activated, a limited number of data points are recorded and displayed in the t-U diagram (CH1).</description>
+	<translations>
+        <translation locale="de">
+			<title>Oszilloskop</title>
+			<category>phyphox E-Lehre-Box</category>
+			<description>E-Lehre-Box als einfaches Oszilloskop.</description>
+            <string original="falling edge">fallende Flanke</string>
+			<string original="rising edge">steigende Flanke</string>
+			<string original="threshold">Schwelle</string>
+			<string original="t-U-plot">U(t)</string>
+			<string original="selected mode">Modus</string>
+			<string original="voltage">Spannung</string>
+			<string original="time">Zeit</string>
+			<string original="Raw Data">Rohdaten</string>
+        </translation>
+    </translations>
+    <data-containers>
+        <container size="0" static="false">voltageCH1</container>
+        <container size="0" static="false">timeCH1</container>
+        <container size="1" init="0" static="false">buttonStatusBuffer</container>
+        <container size="1" static="false">activateTrigger</container>
+        <container size="1" static="false">count</container>
+		
+		
+		<!--<container size="6">configOut</container>-->
+		<!-- oscilloscope (rising edge 22 | falling edge 6) -->
+        <container size="1">mode</container>
+		<container size="1" init="22">modeBuffer</container>
+		<!-- 860SPS -->
+        <container size="1">rate</container>
+		<container size="1" init="224">rateBuffer</container>
+		<!-- 100mV -->
+		<container size="1">threshold</container>
+		<container size="1" init="100">thresholdBuffer</container>
+		
+		<container size="1">nDatapoints</container>
+		<container size="1" init="100">nDatapointsBuffer</container>
+		
+		
+		<container size="1" init="0" static="false">updateConfig</container>
+		
+    </data-containers>
+    <input>
+        <bluetooth id="ELehreBoard" name="E-Lehre"  mode="notification" rate="1" subscribeOnStart="false">
+            <config char="cddf1003-30f7-4671-8b43-5e40ba53514a" conversion="hexadecimal">16E00064012C</config>
+            <output char="cddf1002-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian">voltageCH1</output>
+            <output char="cddf1002-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="8">timeCH1</output>
+        </bluetooth>
+    </input>
+    <output>
+        <bluetooth id="ELehreBoard">
+            <input char="cddf1004-30f7-4671-8b43-5e40ba53514a" conversion="singleByte">activateTrigger</input>
+			
+			<input char="cddf1003-30f7-4671-8b43-5e40ba53514a" conversion="singleByte" offset="0">mode</input>
+			<input char="cddf1003-30f7-4671-8b43-5e40ba53514a" conversion="singleByte" offset="1">rate</input>
+			<input char="cddf1003-30f7-4671-8b43-5e40ba53514a" conversion="int16BigEndian" offset="2">threshold</input>
+			<input char="cddf1003-30f7-4671-8b43-5e40ba53514a" conversion="uInt16BigEndian" offset="4">nDatapoints</input>
+        </bluetooth>
+    </output>
+    <analysis sleep="0.1"  onUserInput="false">
+
+        <if less="false" equal="true" greater="false">
+            <input as="a" clear="false">buttonStatusBuffer</input>
+            <input as="b" type="value">1</input>
+            <input as="true" type="value">1</input>
+            <input as="false" type="empty" />
+            <output clear="true" as="result">activateTrigger</output>
+        </if>
+		
+		<append>
+            <input as="in" type="value">0</input>
+            <output as="out">buttonStatusBuffer</output>
+        </append>
+		
+		<count>
+            <input as="buffer" clear="false">voltageCH1</input>
+            <output as="count">count</output>
+        </count>
+		
+		
+	
+		<!-- UPDATE CONFIG -->
+		<if less="false" equal="true" greater="false">
+            <input as="a" clear="false">updateConfig</input>
+            <input as="b" type="value">1</input>
+            <input as="true" clear="false">modeBuffer</input>
+            <input as="false" type="empty" />
+            <output clear="true" as="result">mode</output>
+        </if>
+		<if less="false" equal="true" greater="false">
+            <input as="a" clear="false">updateConfig</input>
+            <input as="b" type="value">1</input>
+            <input as="true" clear="false">rateBuffer</input>
+            <input as="false" type="empty" />
+            <output clear="true" as="result">rate</output>
+        </if>
+		<if less="false" equal="true" greater="false">
+            <input as="a" clear="false">updateConfig</input>
+            <input as="b" type="value">1</input>
+            <input as="true" clear="false">thresholdBuffer</input>
+            <input as="false" type="empty" />
+            <output clear="true" as="result">threshold</output>
+        </if>
+		<if less="false" equal="true" greater="false">
+            <input as="a" clear="false">updateConfig</input>
+            <input as="b" type="value">1</input>
+            <input as="true" clear="false">nDatapointsBuffer</input>
+            <input as="false" type="empty" />
+            <output clear="true" as="result">nDatapoints</output>
+        </if>
+		<append>
+            <input as="in" type="value">0</input>
+            <output as="out">updateConfig</output>
+        </append>
+
+		
+    </analysis>
+    <views>
+        <view label="Measurement">
+			<edit label="threshold" unit="mV" signed="true" decimal="false"    factor="1" default="0">
+				<output>thresholdBuffer</output>
+            </edit>	
+			
+			<value label="selected mode" size="1" precision="0" scientific="false"  factor="1" >
+                <input>modeBuffer</input>
+				<map min="22" max="22">rising edge</map>
+				<map min="6" max="6">falling edge</map>
+            </value>
+			<!-- rising/falling edge -->
+			<button label="falling edge">
+                <input type="value">6</input>
+                <output>modeBuffer</output>
+            </button>
+				<button label="rising edge">
+                <input type="value">22</input>
+                <output>modeBuffer</output>
+            </button>					
+			<edit label="sample size" unit="" signed="false" decimal="false"    factor="1" default="0">
+				<output>nDatapointsBuffer</output>
+            </edit>
+			<button label="update config">
+                <input type="value">1</input>
+                <output>updateConfig</output>
+            </button>
+            <graph label="t-U-plot" aspectRatio="2.5" style="lines" lineWidth="1" color="ff7e22" partialUpdate="false" history="1" labelX="time" labelY="voltage" labelZ="" unitX="s" unitY="V" unitZ="" logX="false" logY="false" logZ="false" xPrecision="3" yPrecision="3" zPrecision="3" scaleMinX="auto" scaleMaxX="auto" scaleMinY="auto" scaleMaxY="auto" scaleMinZ="auto" scaleMaxZ="auto" minX="0" maxX="0" minY="0" maxY="0" minZ="0" maxZ="0"  mapWidth="0"       >
+                <input axis="x">timeCH1</input>
+                <input axis="y">voltageCH1</input>
+            </graph>
+
+            <button label="activate trigger">
+                <input type="value">1</input>
+                <output>buttonStatusBuffer</output>
+                <input type="empty" />
+                <output>voltageCH1</output>
+                <input type="empty" />
+                <output>timeCH1</output>
+            </button>
+			
+			
+        </view>
+    </views>
+    <export>
+        <set name="Rawdata">
+            <data name="Time CH1 (s)">timeCH1</data>
+	    <data name="Voltage CH1 (V)">voltageCH1</data>
+        </set>
+    </export>
+</phyphox>

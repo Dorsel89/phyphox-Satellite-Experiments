@@ -1,0 +1,83 @@
+<phyphox version="1.12">
+    <title>Pressure Probe</title>
+    <category>phyphox Thermodynamics-Box</category>
+    <color>b51312</color>
+    <description>Uses the MPRLS sensors of the thermodynamics board to measure temperature via a tube.</description>
+    <data-containers>
+        <container size="0">time_raw</container>
+        <container size="1">timeOffset</container>
+	<container size="0">time</container>
+
+        <container size="0">pressure</container>
+		
+	<container size="1">count</container>
+	<container size="1">first</container>
+	<container size="1">rate</container>
+
+        <container size="1" init="0">configButton</container>
+        <container size="2">byteArray</container>
+
+        <container size="1" init="3">interval</container>
+
+    </data-containers>
+    <input>
+        <bluetooth id="satellite-box" name="Satellit" mode="notification">
+            <config char="cddf100e-30f7-4671-8b43-5e40ba53514a" conversion="hexadecimal">0103</config>
+            <output char="cddf100d-30f7-4671-8b43-5e40ba53514a" offset="0" conversion="float32LittleEndian">pressure</output>
+            <output char="cddf100d-30f7-4671-8b43-5e40ba53514a" offset="4" conversion="float32LittleEndian">time_raw</output>
+        </bluetooth>
+    </input>       
+    <views>
+        <view label="Raw data">
+            <graph label="pressure" timeOnX="true" labelX="time" unitX="s" labelY="p" unitY="hPa" partialUpdate="true">
+                <input axis="x">time</input>
+                <input axis="y">pressure</input>                
+            </graph>
+            <value label="p" unit="hPa" size="1" precision="1" scientific="false" factor="1" >
+                <input>pressure</input>
+            </value> 
+        </view>
+   
+    </views>
+    <analysis sleep="0" onUserInput="false">
+		<first>
+            <input as="value" clear="false">time_raw</input>
+            <output as="first">timeOffset</output>
+        </first>
+		<subtract>
+            <input as="minuend" clear="false">time_raw</input>
+            <input as="subtrahend" clear="false">timeOffset</input>
+            <output as="difference">time</output>			
+        </subtract>
+        <count>
+            <input as="buffer" clear="false">pressure</input>
+            <output as="count">count</output>
+        </count>
+        <formula formula="[2]/([1])">
+            <input as="in" clear="false">time</input>
+            <input as="in" clear="false">count</input>
+            <output as="out">rate</output>
+        </formula>
+        <append>
+            <input type="value">1</input>
+            <input clear="false">interval</input>
+            <output as="out">byteArray</output>
+		</append>
+        <if equal="true">
+            <input clear="false">configButton</input>
+            <input type="value">0</input>
+            <input type="empty" />
+            <output as="result" clear="true">byteArray</output>
+        </if>  
+        <append>
+            <input type="value">0</input>
+            <output as="out">configButton</output>
+		</append>      
+    </analysis>
+    <export>
+        <set name="Raw data">
+            <data name="Time (s)">time</data>
+            <data name="Pressure (hPa)">pressure</data>
+        </set>
+    </export>
+</phyphox>

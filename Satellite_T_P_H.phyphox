@@ -1,0 +1,132 @@
+<phyphox version="1.12">
+    <title>Temperature, pressure, humidity</title>
+    <category>phyphox satellite box</category>
+	<color>628E3D</color>
+    <description>Shows the temperature, humidity and pressure rawdata.</description>
+	<translations>
+        <translation locale="de">
+			<title>Temperatur, Druck, Luftfeuchtigkeit</title>
+			<category>phyphox Satelliten-Box</category>
+			<description>Zeigt die Temperatur, Luftfeuchtigkeit und Druck Rohdaten.</description>
+            <string original="temperature">Temperatur</string>
+			<string original="t-T-plot">t-T-Diagramm</string>
+			<string original="t-p-plot">t-p-Diagramm</string>
+			<string original="Relative Humidity">Relative Luftfeuchtigkeit</string>
+			<string original="pressure">Druck</string>
+			<string original="time">Zeit</string>
+			<string original="Raw Data">Rohdaten</string>
+        </translation>
+    </translations>	
+    <data-containers>
+        <container size="0">time_raw</container>
+		<container size="0">time</container>
+		<container size="0">humidity</container>
+		<container size="0">temperature</container>
+		
+		<container size="0">pressure</container>
+		<container size="0">time_raw_BMP</container>
+		<container size="0">temperature_BMP</container>
+		<container size="0">time_BMP</container>
+		
+		<container size="1">count</container>
+		<container size="1">rate</container>
+		<container size="1">timeOffset</container>
+		
+		<container size="1">count_BMP</container>
+		<container size="1">rate_BMP</container>
+		<container size="1">timeOffset_BMP</container>
+		
+    </data-containers>
+    <input>
+        <bluetooth name="Satellit" mode="notification">
+			<config char="cddf1006-30f7-4671-8b43-5e40ba53514a" conversion="hexadecimal">0104</config>
+            <output char="cddf1005-30f7-4671-8b43-5e40ba53514a" offset="0" conversion="float32LittleEndian">temperature</output>
+			<output char="cddf1005-30f7-4671-8b43-5e40ba53514a" offset="4" conversion="float32LittleEndian">humidity</output>
+			<output char="cddf1005-30f7-4671-8b43-5e40ba53514a" offset="8" conversion="float32LittleEndian">time_raw</output>
+			
+			<config char="cddf1008-30f7-4671-8b43-5e40ba53514a" conversion="hexadecimal">01040105</config>
+            <output char="cddf1007-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian">pressure</output>
+            <output char="cddf1007-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="4">temperature_BMP</output>
+            <output char="cddf1007-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="8">time_raw_BMP</output>			
+        </bluetooth>
+    </input>
+    <views>
+        <view label="Raw Data">
+            <graph label="t-T-plot" timeOnX="true" labelX="time" unitX="s" labelY="temperature" unitY="°C" partialUpdate="true">
+                <input axis="y">temperature</input>
+                <input axis="x">time</input>
+            </graph>
+			<value label="temperature" unit="°C" size="1" precision="1" scientific="false" factor="1" >
+                <input>temperature</input>
+            </value>
+			<graph label="Relative Humidity" timeOnX="true" labelX="time" unitX="s" labelY="RH" unitY="%" partialUpdate="true">
+                <input axis="y">humidity</input>
+                <input axis="x">time</input>
+            </graph>
+			<value label="RH" unit="%" size="1" precision="1" scientific="false" factor="1" >
+                <input>humidity</input>
+            </value>
+            <graph label="t-p-plot" timeOnX="true" labelX="time" unitX="s" labelY="pressure" unitY="hPa" partialUpdate="true">
+                <input axis="y">pressure</input>
+                <input axis="x">time_BMP</input>
+            </graph>
+			<value label="pressure" unit="hPa" size="1" precision="1" scientific="false" factor="1" >
+                <input>pressure</input>
+            </value>			
+        </view>
+		<view label="Rate">
+			<value label="Rate SHTC3" unit="Hz" size="1" precision="1" scientific="false" factor="1" >
+                <input>rate</input>
+            </value>
+			<value label="Rate BMP384" unit="Hz" size="1" precision="1" scientific="false" factor="1" >
+                <input>rate_BMP</input>
+            </value>
+		</view>
+    </views>
+    <analysis optimization="true">
+		<first>
+            <input as="value" clear="false">time_raw</input>
+            <output as="first">timeOffset</output>
+        </first>
+		<subtract>
+            <input as="minuend" clear="false">time_raw</input>
+            <input as="subtrahend" clear="false">timeOffset</input>
+            <output as="difference">time</output>			
+        </subtract>
+        <count>
+            <input as="buffer" clear="false">humidity</input>
+            <output as="count">count</output>
+        </count>
+        <formula formula="[2]/([1])">
+            <input as="in" clear="false">time</input>
+            <input as="in" clear="false">count</input>
+            <output as="out">rate</output>
+        </formula>
+
+		<first>
+            <input as="value" clear="false">time_raw_BMP</input>
+            <output as="first">timeOffset_BMP</output>
+        </first>
+		<subtract>
+            <input as="minuend" clear="false">time_raw_BMP</input>
+            <input as="subtrahend" clear="false">timeOffset_BMP</input>
+            <output as="difference">time_BMP</output>			
+        </subtract>
+        <count>
+            <input as="buffer" clear="false">pressure</input>
+            <output as="count">count_BMP</output>
+        </count>
+        <formula formula="[2]/([1])">
+            <input as="in" clear="false">time_BMP</input>
+            <input as="in" clear="false">count_BMP</input>
+            <output as="out">rate_BMP</output>
+        </formula>
+    </analysis>
+    <export>
+        <set name="Raw Data">
+            <data name="Time (s)">time</data>
+            <data name="Temperature (°C)">temperature</data>
+			<data name="Humidity (%)">humidity</data>
+        </set>
+    </export>
+</phyphox>

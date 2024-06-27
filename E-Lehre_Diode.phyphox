@@ -1,0 +1,107 @@
+<phyphox version="1.7" locale="en">
+    <title>Diode characteristic</title>
+    <category>phyphox electricity box</category>
+    <description>Measuring the input voltage and current through the diode, while in- or decreasing the input voltage.</description>
+	<color>ffbe1a</color>
+	<translations>
+		<translation locale="de">
+			<title>Diodenkennlinie</title>
+			<category>phyphox E-Lehre-Box</category>
+			<description>Es werden sowohl die Spannung über der Diode als auch der Strom durch die Diode als Spannungsabfall am Vorwiderstand gemessen und grafisch dargestellt, während die anliegende Spannung variiert wird.</description>
+			<string original="Rawdata">Rohdaten</string>
+			<string original="resistance for current measurement:">Ohmscher Widerstand zur Strommessung:</string>
+			<string original="voltage">Spannung</string>
+			<string original="current">Strom</string>
+			<string original="time">Zeit</string>
+			<string original="U-I-plot">U-I-Diagramm</string>
+			<string original="voltage CH1">Spannung Kanal 1</string>
+			<string original="current CH2">Strom Kanal 2</string> "I-U-plot"
+		</translation>
+	</translations>
+	
+    <data-containers>
+        <container size="0" static="false">voltageCH1</container>
+        <container size="0" static="false">voltageCH2</container>
+        <container size="0" static="false">timeCH1</container>
+		<container size="0" static="false">timeCH2</container>
+		<container size="1" static="false">timeCH1_Offset</container>
+		<container size="1" static="false">timeCH2_Offset</container>
+		<container size="0" static="false">timeCH1_new</container>
+		<container size="0" static="false">timeCH2_new</container>
+		<container size="1" static="false">resistance</container>
+		<container size="0" static="false">currentCH2</container>
+    </data-containers>
+	
+    <input>
+        <bluetooth name="E-Lehre" mode="notification" rate="1" subscribeOnStart="false">
+            <config char="cddf1003-30f7-4671-8b43-5e40ba53514a" conversion="hexadecimal">0C60</config>
+            <output char="cddf1002-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian">voltageCH1</output>
+            <output char="cddf1002-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="4">voltageCH2</output>
+            <output char="cddf1002-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="8">timeCH1</output>
+			<output char="cddf1002-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="12">timeCH2</output>
+        </bluetooth>
+	</input>
+	
+    <output>
+    </output>
+	
+    <analysis sleep="0"  onUserInput="false">
+		<first>
+			<input clear="false">timeCH1</input>
+			<output>timeCH1_Offset</output>
+		</first>
+		
+		<subtract>
+			<input clear="false">timeCH1</input>
+			<input clear="false">timeCH1_Offset</input>
+			<output>timeCH1_new</output>
+		</subtract>
+		
+		<first>
+			<input clear="false">timeCH2</input>
+			<output>timeCH2_Offset</output>
+		</first>
+		
+		<subtract>
+			<input clear="false">timeCH2</input>
+			<input clear="false">timeCH2_Offset</input>
+			<output>timeCH2_new</output>
+		</subtract>
+		
+		<divide>
+			<input as="dividend" clear="false">voltageCH2</input>
+			<input as="divisor" clear="false">resistance</input>
+			<input as="divisor" type="value">0.001</input>
+			<output>currentCH2</output>
+		</divide>
+    </analysis>
+    <views>
+        <view label="Diode characteristic">
+			<edit label="resistance for current measurement:" unit="Ω" factor="1" decimal="true" signed="false" default="470">
+                <output>resistance</output>
+            </edit>
+            <graph label="U-I-plot" aspectRatio="2.5" style="lines" lineWidth="1" color="ff7e22" partialUpdate="false" history="1" labelX="voltage" labelY="current" unitX="V" unitY="mA" logX="false" logY="false" xPrecision="3" yPrecision="3" scaleMinX="auto" scaleMaxX="auto" scaleMinY="auto" scaleMaxY="auto" minX="0" maxX="0" minY="0" maxY="0" mapWidth="0">
+				<input axis="x">voltageCH1</input>
+                <input axis="y">currentCH2</input>
+            </graph>
+			<separator color="ff7e22" height="0.1" />
+            <value label="voltage CH1" size="1" precision="2" scientific="false"  unit="V" factor="1">
+                <input>voltageCH1</input>
+            </value>
+			<value label="current CH2" size="1" precision="0" scientific="false" unit="mA" factor="1">
+                <input>currentCH2</input>
+            </value>			
+		</view>
+	</views>
+	
+    <export>
+		<set name="Raw data">
+            <data name="Time t (s)">timeCH1_new</data>
+			<data name="Time t (s)">timeCH2_new</data>
+            <data name="U CH1 (V)">voltageCH1</data>
+			<data name="U CH2 (V)">voltageCH2</data>
+			<data name="I CH2 (mA)">currentCH2</data>
+        </set>
+    </export>
+	
+</phyphox>
