@@ -78,6 +78,9 @@
                 <input>height</input>
             </value>		
         </view>
+		<view label="Share">		
+			<image src="qr.png" scale="1.0" lightFilter="none" darkFilter="none" />
+		</view>		
     </views>
     <export>
 		<set name="Rawdata">
