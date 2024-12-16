@@ -1,0 +1,180 @@
+<phyphox version="1.12">
+    <title>Raw data</title>
+    <category>phyphox distance box</category>
+    <description>Shows the distance sensor rawdata.</description>
+	<translations>
+        <translation locale="de">
+            <title>Rohdaten</title>
+			<category>phyphox Distanz-Box</category>
+			<description>Zeigt die Rohdaten der Distanzbox.</description>
+            <string original="distance">Distanz</string>
+			<string original="time">Zeit</string>
+			<string original="t-s-plot">t-s-Diagramm</string>
+            <string original="Raw data">Rohdaten</string>
+            <string original="distance box">Distanz-Box</string>
+            <string original="Below the average rate of all data points is shown. If you changed settings while measureing you should clear your old data to get the new rate!">Im folgenden wird die durchschnittliche Datenrate angezeigt. Falls du die Sensor-Einstellungen während der Messung änderst, solltes du die aufgenommenen Messwerte löschen um die neue Rate zu sehen</string>
+            <string original="average rate">Rate</string>
+            <string original="Short mode works up to 136cm and long mode up to 400cm (in dark conditions).">Der "short mode" funktioniert bis 136cm und der "long mode bis 400cm (im abgedunkelten Raum).</string>
+            <string original="Choose the measurement period. The 20ms period only works in short mode. To measure up to 4m a measurement interval of 200ms is required.">Wähle ein Messintervall. Das 20ms Intervall kann nur im "short mode" genutzt werden. Es sind 200ms nötig um bis zu 4m messen zu können.</string>
+            <string original="Clear the measured data buffer">Lösche die bisher aufgenommenen Daten.</string>
+            <string original="clear data">Daten löschen</string>
+            <string original="distance-box">Distanz-Box</string>
+        </translation>
+    </translations>
+    <data-containers>
+        <container size="0">time_raw</container>
+        <container size="1">timeOffset</container>
+		<container size="0">time</container>
+		<container size="0">distance</container>
+		
+		<container size="1">count</container>
+		<container size="1">first</container>
+		<container size="1">rate</container>
+
+        <container size="1" init="0">configButton</container>
+        <container size="3">byteArray</container>
+
+        <container size="1" init="1">distanceMode</container>
+        <container size="1" init="1">timingBudget</container>
+
+    </data-containers>
+    <input>
+        <bluetooth id="distance-box" name="Distanz" mode="notification">
+            <config char="cddf1003-30f7-4671-8b43-5e40ba53514a" conversion="hexadecimal">010101</config>
+            <output char="cddf1002-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian">distance</output>
+            <output char="cddf1002-30f7-4671-8b43-5e40ba53514a" offset="4" conversion="float32LittleEndian">time_raw</output>
+        </bluetooth>
+    </input>       
+    <output>
+        <bluetooth id="distance-box">
+            <input char="cddf1003-30f7-4671-8b43-5e40ba53514a" conversion="byteArray">byteArray</input>
+        </bluetooth>
+    </output>
+    <views>
+        <view label="Raw data">
+            <graph label="t-s-plot" timeOnX="true" labelX="time" unitX="s" labelY="distance" unitY="mm" partialUpdate="true">
+                <input axis="y">distance</input>
+                <input axis="x">time</input>
+            </graph>
+            <value label="distance" unit="mm" size="1" precision="1" scientific="false" factor="1" >
+                <input>distance</input>
+            </value> 
+        </view>
+       
+		<view label="Rate">
+            <info label="Below the average rate of all data points is shown. If you changed settings while measureing you should clear your old data to get the new rate!" >
+            </info>
+            <separator height="0.5" >
+            </separator>
+			<value label="average rate" unit="Hz" size="1" precision="1" scientific="false" factor="1" >
+                <input>rate</input>
+            </value>
+            <separator height="0.8" >
+            </separator>
+            <info label="Short mode works up to 136cm and long mode up to 400cm (in dark conditions)." >
+            </info>
+            <button label="short mode">
+                <input type="value">0</input>
+                <output>distanceMode</output>
+                <input type="value">1</input>
+                <output>configButton</output>
+            </button>
+            <button label="long mode">
+                <input type="value">1</input>
+                <output>distanceMode</output>
+                <input type="value">1</input>
+                <output>configButton</output>
+            </button>
+            <separator height="0.5" >
+            </separator>
+            <info label="Choose the measurement period. The 20ms period only works in short mode. To measure up to 4m a measurement interval of 200ms is required." >
+            </info>               
+            <button label="20ms">
+                <input type="value">1</input>
+                <output>timingBudget</output>
+                <input type="value">1</input>
+                <output>configButton</output>
+            </button>    
+            <button label="33ms">
+                <input type="value">2</input>
+                <output>timingBudget</output>
+                <input type="value">1</input>
+                <output>configButton</output>
+            </button>   
+            <button label="50ms">
+                <input type="value">3</input>
+                <output>timingBudget</output>
+                <input type="value">1</input>
+                <output>configButton</output>
+            </button>   
+            <button label="100ms">
+                <input type="value">4</input>
+                <output>timingBudget</output>
+                <input type="value">1</input>
+                <output>configButton</output>
+            </button>
+            <button label="200ms">
+                <input type="value">5</input>
+                <output>timingBudget</output>
+                <input type="value">1</input>
+                <output>configButton</output>
+            </button>
+            <separator height="0.5" >
+            </separator>
+            <info label="Clear the measured data buffer" >
+            </info>
+            <button label="clear data">
+                <input type="empty" />
+                <output>distance</output>
+                <input type="empty" />
+                <output>timeOffset</output>
+                <input type="empty" />
+                <output>time_raw</output>
+                <input type="empty" />
+                <output>time</output>                
+            </button>        
+		</view>
+    </views>
+    <analysis sleep="0" onUserInput="false">
+		<first>
+            <input as="value" clear="false">time_raw</input>
+            <output as="first">timeOffset</output>
+        </first>
+		<subtract>
+            <input as="minuend" clear="false">time_raw</input>
+            <input as="subtrahend" clear="false">timeOffset</input>
+            <output as="difference">time</output>			
+        </subtract>
+        <count>
+            <input as="buffer" clear="false">distance</input>
+            <output as="count">count</output>
+        </count>
+        <formula formula="[2]/([1])">
+            <input as="in" clear="false">time</input>
+            <input as="in" clear="false">count</input>
+            <output as="out">rate</output>
+        </formula>
+        <append>
+            <input type="value">1</input>
+            <input clear="false">distanceMode</input>
+            <input clear="false">timingBudget</input>
+            <output as="out">byteArray</output>
+		</append>
+        <if equal="true">
+            <input clear="false">configButton</input>
+            <input type="value">0</input>
+            <input type="empty" />
+            <output as="result" clear="true">byteArray</output>
+        </if>  
+        <append>
+            <input type="value">0</input>
+            <output as="out">configButton</output>
+		</append>      
+    </analysis>
+    <export>
+        <set name="Raw data">
+            <data name="Time (s)">time</data>
+            <data name="distance (mm)">distance</data>
+        </set>
+    </export>
+</phyphox>
